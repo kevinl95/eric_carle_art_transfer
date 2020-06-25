@@ -4,7 +4,6 @@ from hashlib import sha1
 from shutil import rmtree
 from stat import S_ISREG, ST_CTIME, ST_MODE
 import json
-import os
 import time
 
 from PIL import Image, ImageFile
@@ -422,7 +421,7 @@ def save_normalized_image(path, data):
         image = image.convert('RGB')
     image.save(path)
     best, best_loss = run_style_transfer(path,
-                                         style_path, num_iterations=100)
+                                         style_path, num_iterations=10)
     bestImage = Image.fromarray(best)
     os.remove(path)
     bestImage.save(path, "JPEG")
@@ -449,7 +448,8 @@ def post():
     target = os.path.join(DATA_DIR, '{}.jpg'.format(sha1sum))
     message = json.dumps({'src': target,
                           'ip_addr': safe_addr(flask.request.access_route[0])})
-    if save_normalized_image(target, flask.request.data):
+    res = save_normalized_image(target, flask.request.data)
+    if res:
         broadcast(message)  # Notify subscribers of completion
     return 'success'
 
@@ -481,7 +481,7 @@ def home():
                       .format(path))
     return """
 <!doctype html>
-<title>Image Uploader</title>
+<title>Eric Carle Art Style Transfer</title>
 <meta charset="utf-8" />
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
@@ -491,14 +491,14 @@ def home():
     max-width: 800px;
     margin: auto;
     padding: 1em;
-    background: black;
-    color: #fff;
+    background: white;
+    color: black;
     font: 16px/1.6 menlo, monospace;
     text-align:center;
   }
 
   a {
-    color: #fff;
+    color: black;
   }
 
   .notice {
@@ -525,11 +525,9 @@ def home():
 }
 
 </style>
-<h3>Image Uploader</h3>
-<p>Upload an image for everyone to see. Valid images are pushed to everyone
+<h3>Eric Carle Art Style Transfer</h3>
+<p>Upload a drawing and let my machine learning model make it look like one of Eric Carle's illustrations! Valid images are pushed to everyone
 currently connected, and only the most recent %s images are saved.</p>
-<p>The complete source for this Flask web service can be found at:
-<a href="https://github.com/bboe/flask-image-uploader">https://github.com/bboe/flask-image-uploader</a></p>
 <p class="notice">Disclaimer: The author of this application accepts no responsibility for the
 images uploaded to this web service. To discourage the submission of obscene images, IP
 addresses with the last two octets hidden will be visibly associated with uploaded images.</p>
@@ -566,7 +564,7 @@ dynamically view new images.</noscript>
       var status = $('#status');
       var xhr = new XMLHttpRequest();
       xhr.upload.addEventListener('loadstart', function(e1){
-          status.text('uploading image');
+          status.text('Processing your image- this may take some time!');
           progressbar.progressbar({max: e1.total});
       });
       xhr.upload.addEventListener('progress', function(e1){
@@ -605,16 +603,6 @@ dynamically view new images.</noscript>
       e.target.value = '';
   });
   sse();
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-510348-17']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
 </script>
 """ % (MAX_IMAGES, '\n'.join(images))  # noqa
 

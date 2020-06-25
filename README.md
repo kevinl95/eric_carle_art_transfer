@@ -1,7 +1,8 @@
-A simple flask app that runs on heroku and demonstrates HTML Server-Sent Events
-(EventSource) protocol.
+# Eric Carle Art Transfer
 
-See running demo at:
-http://bboe-image.herokuapp.com/
+Flask web app that wraps code that performs neural style transfer from Eric Carle's Very Hungry Caterpillar
+to an uploaded image.
 
-Inspired by: https://github.com/jkbr/chat
+Utilizes code from (this excellent Google Collab notebook)[https://colab.research.google.com/github/tensorflow/models/blob/master/research/nst_blogpost/4_Neural_Style_Transfer_with_Eager_Execution.ipynb#scrollTo=vSVMx4burydi]
+
+(Try it live!)[http://ericcarlearttransfer.ml/]

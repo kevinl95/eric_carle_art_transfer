@@ -1,4 +1,4 @@
-"""An example flask application demonstrating server-sent events."""
+"""REST API around a model that transfers the art style of Eric Carle onto an uploaded image."""
 
 from hashlib import sha1
 from shutil import rmtree
@@ -70,17 +70,6 @@ def deprocess_img(processed_img):
 
   x = np.clip(x, 0, 255).astype('uint8')
   return x
-
-"""### Define content and style representations
-In order to get both the content and style representations of our image, we will look at some intermediate layers within our model. As we go deeper into the model, these intermediate layers represent higher and higher order features. In this case, we are using the network architecture VGG19, a pretrained image classification network. These intermediate layers are necessary to define the representation of content and style from our images. For an input image, we will try to match the corresponding style and content target representations at these intermediate layers.
-
-#### Why intermediate layers?
-
-You may be wondering why these intermediate outputs within our pretrained image classification network allow us to define style and content representations. At a high level, this phenomenon can be explained by the fact that in order for a network to perform image classification (which our network has been trained to do), it must understand the image. This involves taking the raw image as input pixels and building an internal representation through transformations that turn the raw image pixels into a complex understanding of the features present within the image. This is also partly why convolutional neural networks are able to generalize well: they’re able to capture the invariances and defining features within classes (e.g., cats vs. dogs) that are agnostic to background noise and other nuisances. Thus, somewhere between where the raw image is fed in and the classification label is output, the model serves as a complex feature extractor; hence by accessing intermediate layers, we’re able to describe the content and style of input images.
-
-
-Specifically we’ll pull out these intermediate layers from our network:
-"""
 
 # Content layer where will pull our feature maps
 content_layers = ['block5_conv2']
